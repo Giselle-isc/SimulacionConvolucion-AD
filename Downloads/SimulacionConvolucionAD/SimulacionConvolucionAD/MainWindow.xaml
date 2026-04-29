@@ -1,0 +1,106 @@
+﻿<Window x:Class="Simulacion_AD_Convolucion.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        Title="Simulador PRO v2.5" Height="750" Width="1200" 
+        Background="#F5F0E1" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="WatermarkTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" 
+                                    BorderBrush="#D4C8B0" BorderThickness="1"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="8,0"/>
+                            <TextBlock x:Name="textBlock" Text="{TemplateBinding Tag}" Foreground="DarkGray" 
+                                       IsHitTestVisible="False" Margin="11,0" VerticalAlignment="Center" 
+                                       Visibility="Collapsed" FontStyle="Italic"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="textBlock" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="350"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="White" CornerRadius="15" Margin="5" Padding="15">
+            <StackPanel>
+                <TextBlock Text="CONFIGURACIÓN" FontWeight="Bold" FontSize="18" Foreground="#5D5B50" Margin="0,0,0,15"/>
+
+                <Label Content="Media (μ):" Foreground="#8D8B80"/>
+                <TextBox x:Name="txtMedia" Style="{StaticResource WatermarkTextBox}" Tag="Escribe la media (ej: 100)"/>
+
+                <Label Content="Desv. Estándar (σ):" Margin="0,10,0,0" Foreground="#8D8B80"/>
+                <TextBox x:Name="txtDesv" Style="{StaticResource WatermarkTextBox}" Tag="Escribe la desviación (ej: 15)"/>
+
+                <TabControl Margin="0,20,0,0" Background="Transparent" BorderThickness="0">
+                    <TabItem Header="Automático">
+                        <StackPanel Margin="0,10">
+                            <Label Content="Tamaño de Muestra (N):" Foreground="#8D8B80"/>
+                            <TextBox x:Name="txtN" Style="{StaticResource WatermarkTextBox}" Tag="Ej: 1000"/>
+                            <Button Content="Generar Muestra" Click="BtnGenerarAuto_Click" Margin="0,10,0,0" Height="35" Background="#E6A082" Foreground="White"/>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="Manual">
+                        <StackPanel Margin="0,10">
+                            <Label Content="Tus 12 números (separados por coma):" Foreground="#8D8B80"/>
+                            <TextBox x:Name="txt12Numeros" Style="{StaticResource WatermarkTextBox}" Tag="0.5, 0.1, 0.9..." Height="60" TextWrapping="Wrap"/>
+                            <Button Content="Generar 1 con mis datos" Click="BtnGenerarManual_Click" Margin="0,10,0,0" Height="35" Background="#D4C8B0"/>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+
+                <DataGrid x:Name="dgDatos" Height="180" Margin="0,20,0,0" AutoGenerateColumns="True" IsReadOnly="True" Background="#FCFAF5"/>
+                <Button Content="Limpiar Todo" Click="BtnLimpiar_Click" Margin="0,10" Background="#FAD7A0" Height="25" BorderThickness="0"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Background="White" CornerRadius="15" Margin="5" Padding="15">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <lvc:CartesianChart x:Name="graficoGauss">
+                    <lvc:CartesianChart.Series>
+                        <lvc:LineSeries Title="Distribución" Values="{Binding GraficoValores}" Stroke="#E6A082" PointGeometrySize="0"/>
+                    </lvc:CartesianChart.Series>
+                </lvc:CartesianChart>
+                <Button Grid.Row="1" Content="EJECUTAR PRUEBA ANDERSON-DARLING" Click="BtnCalcularAD_Click" Height="50" FontWeight="Bold" Background="#2C2E31" Foreground="White"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="2" Background="#2C2E31" CornerRadius="15" Margin="5" Padding="20">
+            <StackPanel>
+                <TextBlock Text="RESULTADOS" Foreground="White" FontWeight="Bold" FontSize="18" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+                <Border Background="#3D3F42" CornerRadius="10" Padding="15">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="Estadístico A²" Foreground="#B0B0B0" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="txtResultadoAD" Text="---" Foreground="White" FontSize="45" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+                <Border x:Name="borderVeredicto" Background="#4A4C4F" CornerRadius="10" Padding="20" Margin="0,20">
+                    <TextBlock x:Name="lblEstado" Text="SIN DATOS" Foreground="White" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Aceptado si A² &lt; 0.752" Foreground="#8D8B80" FontSize="11" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
